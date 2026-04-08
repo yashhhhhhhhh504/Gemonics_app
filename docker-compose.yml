@@ -1,0 +1,32 @@
+# ============================================================================
+# NGS Analysis Platform - Docker Compose
+# Usage: docker compose up --build
+# ============================================================================
+
+services:
+  ngs-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ngs-analysis-platform
+    ports:
+      - "8000:8000"
+    volumes:
+      # Named volume keeps uploads, results, and temp data across rebuilds
+      - ngs-data:/app/data
+      # Bind-mount for reference genomes so you can add them from the host
+      - ./data/references:/app/data/references
+    environment:
+      - SECRET_KEY=change-this-to-a-secure-random-string
+      - UPLOAD_DIR=/app/data/uploads
+      - RESULTS_DIR=/app/data/results
+      - REFERENCES_DIR=/app/data/references
+      - TEMP_DIR=/app/data/temp
+      - MAX_THREADS=4
+      - MAX_MEMORY_GB=8
+      - MAX_CONCURRENT_JOBS=2
+    restart: unless-stopped
+
+volumes:
+  ngs-data:
+    driver: local
